@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import PromptCard from "./PromptCard";
+import useDebounce from "@hooks/useDebounce";
 
 const PromptCardList = ({ data, handleTagClick }) => {
   return (
@@ -17,18 +18,28 @@ const Feed = () => {
   const [searchText, setSearchText] = useState("");
   const [posts, setPosts] = useState([]);
 
-  const handleSearchChange = (e) => {};
+  const debouncedInputValue = useDebounce(searchText, 300);
+
+  const fetchPosts = async () => {
+    let apiFetchPrompt = "/api/prompt";
+
+    if (searchText) {
+      apiFetchPrompt = apiFetchPrompt + `?searchText=${debouncedInputValue}`;
+    }
+
+    const response = await fetch(apiFetchPrompt);
+    const data = await response.json();
+
+    setPosts(data);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await fetch("/api/prompt");
-      const data = await response.json();
-
-      setPosts(data);
-    };
-
     fetchPosts();
-  }, []);
+  }, [debouncedInputValue]);
 
   return (
     <section className='feed'>

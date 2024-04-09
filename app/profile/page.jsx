@@ -47,6 +47,7 @@ const MyProfile = () => {
       }
     }
   };
+
   return (
     <Profile
       name='My'
